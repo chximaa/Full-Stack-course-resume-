@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JPA / Hibernate – Full Stack Learning Guide</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body class="dark">
+
+  <!-- ══════════════════════════ HEADER ══════════════════════════ -->
+  <header>
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">⬡</span>
+        <span>JPA<em>Learn</em></span>
+      </div>
+      <nav id="main-nav">
+        <a href="#oop">OOP</a>
+        <a href="#associations">Associations</a>
+        <a href="#cardinalities">Cardinalities</a>
+        <a href="#collections">Collections</a>
+        <a href="#mapping">Mapping</a>
+        <a href="#quiz">Quiz</a>
+      </nav>
+      <button id="theme-toggle" aria-label="Toggle theme">
+        <span id="theme-icon">☀️</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════ HERO ══════════════════════════ -->
+  <section class="hero">
+    <div class="hero-badge">Full-Stack Notes → Interactive Guide</div>
+    <h1>Master <span class="accent">JPA & Hibernate</span><br/>Associations</h1>
+    <p class="hero-sub">A complete beginner-friendly guide covering OOP entities, associations, cardinalities, collections and mapping — built from handwritten course notes.</p>
+    <div class="hero-chips">
+      <span>Java</span><span>JPA</span><span>Hibernate</span><span>Spring Boot</span><span>SQL</span>
+    </div>
+    <a href="#oop" class="cta-btn">Start Learning ↓</a>
+  </section>
+
+  <main>
+
+    <!-- ══════════════════════════ 1. OOP ══════════════════════════ -->
+    <section id="oop" class="content-section">
+      <div class="section-label">Chapter 01</div>
+      <h2>Object-Oriented Programming & Entities</h2>
+      <p class="section-intro">In OOP, a <strong>class</strong> models a real-world concept. In full-stack apps these classes become <strong>database entities</strong> managed by JPA/Hibernate.</p>
+
+      <div class="cards-grid">
+
+        <div class="card">
+          <div class="card-header" onclick="toggleCard(this)">
+            <span class="card-icon">🏛️</span>
+            <h3>What is a Class in OOP?</h3>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="card-body">
+            <p>A <strong>class</strong> is a blueprint that describes an object's data (fields) and behaviour (methods). In business applications, classes typically mirror real-world entities:</p>
+            <ul>
+              <li><code>Client</code> → represents a customer</li>
+              <li><code>Commande</code> → represents an order</li>
+              <li><code>Employé</code> → represents an employee</li>
+            </ul>
+            <div class="code-block">
+<pre><span class="kw">@Entity</span>
+<span class="kw">public class</span> <span class="cls">Client</span> {
+    <span class="kw">@Id</span>
+    <span class="kw">@GeneratedValue</span>
+    <span class="kw">private</span> Long id;
+    <span class="kw">private</span> String nom;
+    <span class="kw">private</span> String email;
+    <span class="cm">// getters & setters...</span>
+}</pre>
+            </div>
+            <div class="info-box">💡 The <code>@Entity</code> annotation tells JPA: "Create a table for this class in the database."</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header" onclick="toggleCard(this)">
+            <span class="card-icon">🔗</span>
+            <h3>Why Do Entities Need Links?</h3>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="card-body">
+            <p>Entities don't live in isolation — they have <strong>logical relationships</strong>. Examples:</p>
+            <ul>
+              <li>A <em>Client</em> places many <em>Commandes</em></li>
+              <li>A <em>Commande</em> belongs to exactly one <em>Client</em></li>
+              <li>A <em>Passport</em> belongs to one <em>Person</em></li>
+            </ul>
+            <p>These links must be <strong>translated into JPA/Hibernate</strong> — that's what <em>associations</em> are for. In the database they become <strong>foreign keys</strong> or <strong>join tables</strong>.</p>
+            <div class="info-box">🌍 Real world: An e-commerce platform like Amazon maps this exactly: Customer → Orders → Products.</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header" onclick="toggleCard(this)">
+            <span class="card-icon">📋</span>
+            <h3>Simple Method to Model an Association</h3>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="card-body">
+            <p>The course gives a 3-step method:</p>
+            <ol>
+              <li><strong>Write the relation in plain French/English</strong><br/>"A client places several orders. An order belongs to one client."</li>
+              <li><strong>Identify the number of objects on each side</strong><br/>Client → N orders | Order → 1 client</li>
+              <li><strong>Choose the correct annotation</strong><br/>→ <code>@OneToMany</code> on Client, <code>@ManyToOne</code> on Commande</li>
+            </ol>
+            <div class="info-box">✅ Always start with a business sentence — it prevents cardinality mistakes!</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ══════════════════════════ 2. ASSOCIATIONS ══════════════════════════ -->
+    <section id="associations" class="content-section alt-bg">
+      <div class="section-label">Chapter 02</div>
+      <h2>Unidirectional vs Bidirectional Associations</h2>
+      <p class="section-intro">An <strong>association</strong> defines how two entity classes are connected. The key question: does <em>one</em> side know about the other, or <em>both</em>?</p>
+
+      <div class="compare-grid">
+        <div class="compare-card uni">
+          <div class="compare-header">
+            <span class="badge">2-1</span>
+            <h3>Unidirectional 👉</h3>
+          </div>
+          <p><strong>Only one class holds a reference to the other.</strong></p>
+          <p>Example: <code>Client</code> has a list of <code>Commande</code>, but <code>Commande</code> does NOT hold a reference back to <code>Client</code>.</p>
+          <div class="code-block">
+<pre><span class="kw">@Entity</span>
+<span class="kw">public class</span> <span class="cls">Client</span> {
+    <span class="kw">@OneToMany</span>
+    <span class="kw">private</span> List&lt;Commande&gt; commandes;
+}
+
+<span class="kw">@Entity</span>
+<span class="kw">public class</span> <span class="cls">Commande</span> {
+    <span class="cm">// No reference to Client here</span>
+}</pre>
+          </div>
+          <div class="pros-cons">
+            <div class="pros">✅ Simpler to code<br/>✅ Easier to explain<br/>✅ Good when navigation is one-way</div>
+            <div class="cons">⚠️ Can't navigate from Commande → Client<br/>⚠️ May cause extra JOIN tables</div>
+          </div>
+        </div>
+
+        <div class="compare-card bi">
+          <div class="compare-header">
+            <span class="badge">2-2</span>
+            <h3>Bidirectional ↔️</h3>
+          </div>
+          <p><strong>Both classes know each other.</strong></p>
+          <p>Example: <code>Client</code> knows its <code>Commande</code>s AND each <code>Commande</code> knows its <code>Client</code>.</p>
+          <div class="code-block">
+<pre><span class="kw">@Entity</span>
+<span class="kw">public class</span> <span class="cls">Client</span> {
+    <span class="kw">@OneToMany</span>(mappedBy=<span class="str">"client"</span>)
+    <span class="kw">private</span> List&lt;Commande&gt; commandes;
+}
+
+<span class="kw">@Entity</span>
+<span class="kw">public class</span> <span class="cls">Commande</span> {
+    <span class="kw">@ManyToOne</span>
+    <span class="kw">private</span> Client client; <span class="cm">// owns FK</span>
+}</pre>
+          </div>
+          <div class="pros-cons">
+            <div class="pros">✅ Navigate both ways<br/>✅ Richer object model<br/>✅ Efficient queries</div>
+            <div class="cons">⚠️ Requires mastery of the owner side<br/>⚠️ Must use <code>mappedBy</code> correctly</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="key-concept-box">
+        <h4>🔑 Key Rule for Bidirectional</h4>
+        <p>In a bidirectional relation you must identify:</p>
+        <ul>
+          <li><strong>Owner side</strong> (propriétaire) — the side that actually holds the foreign key in the DB. Usually the <code>@ManyToOne</code> side.</li>
+          <li><strong>Inverse side</strong> — uses <code>mappedBy</code> to point to the owner's field name. This side does NOT generate a foreign key column.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════ 3. CARDINALITIES ══════════════════════════ -->
+    <section id="cardinalities" class="content-section">
+      <div class="section-label">Chapter 03</div>
+      <h2>Cardinalities — The 4 JPA Annotations</h2>
+      <p class="section-intro">Cardinality describes <em>how many</em> objects of one type relate to another. JPA provides four dedicated annotations.</p>
+
+      <div class="cards-grid four-col">
+
+        <!-- OneToOne -->
+        <div class="card cardinal-card">
+          <div class="card-header" onclick="toggleCard(this)">
+            <div class="cardinal-badge oto">1 → 1</div>
+            <h3>@OneToOne</h3>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="card-body">
+            <p><strong>One object corresponds to exactly one other object.</strong></p>
+            <p>📌 Example: A <em>Person</em> has one <em>Passport</em> and a <em>Passport</em> belongs to one <em>Person</em>.</p>
+            <div class="code-block">
+<pre><span class="kw">@Entity</span>
+<span class="kw">public class</span> <span class="cls">Personne</span> {
+    <span class="kw">@OneToOne</span>
+    <span class="kw">private</span> Passport passport;
+}
+
+<span class="kw">@Entity</span>
+<span class="kw">public class</span> <span class="cls">Passport</span> {
+    <span class="cm">// optional: back-ref</span>
+    <span class="kw">@OneToOne</span>(mappedBy=<span class="str">"passport"</span>)
+    <span class="kw">private</span> Personne personne;
+}</pre>
+            </div>
+            <p><strong>DB result:</strong> A <code>personne_id</code> foreign key column is added to the <code>passport</code> table (or vice versa, depending on the owner).</p>
+            <div class="info-box">🌍 Real use: User → Profile, Employee → Contract</div>
+          </div>
+        </div>
+
+        <!-- OneToMany -->
+        <div class="card cardinal-card">
+          <div class="card-header" onclick="toggleCard(this)">
+            <div class="cardinal-badge otm">1 → N</div>
+            <h3>@OneToMany</h3>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="card-body">
+            <p><strong>One object can be linked to multiple objects on the other side.</strong></p>
+            <p>📌 Example: One <em>Client</em> can place many <em>Commandes</em>.</p>
+            <div class="code-block">
+<pre><span class="kw">@Entity</span>
+<span class="kw">public class</span> <span class="cls">Client</span> {
+    <span class="kw">@OneToMany</span>(mappedBy=<span class="str">"client"</span>)
+    <span class="kw">private</span> List&lt;Commande&gt; commandes
+        = <span class="kw">new</span> ArrayList&lt;&gt;();
+}</pre>
+            </div>
+            <p><strong>DB result:</strong> The <code>Commande</code> table holds a <code>client_id</code> foreign key column.</p>
+            <div class="info-box">🌍 Real use: Author → Books, Department → Employees</div>
+          </div>
+        </div>
+
+        <!-- ManyToOne -->
+        <div class="card cardinal-card">
+          <div class="card-header" onclick="toggleCard(this)">
+            <div class="cardinal-badge mto">N → 1</div>
+            <h3>@ManyToOne</h3>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="card-body">
+            <p><strong>Multiple objects are linked to one single object.</strong></p>
+            <p>📌 Example: Many <em>Commandes</em> belong to one <em>Client</em>.</p>
+            <div class="code-block">
+<pre><span class="kw">@Entity</span>
+<span class="kw">public class</span> <span class="cls">Commande</span> {
+    <span class="kw">@ManyToOne</span>
+    <span class="kw">@JoinColumn</span>(name=<span class="str">"client_id"</span>)
+    <span class="kw">private</span> Client client;
+}</pre>
+            </div>
+            <p><strong>DB result:</strong> A <code>client_id</code> FK column appears in the <code>commande</code> table. This is the <strong>owner side</strong> of a bidirectional relation.</p>
+            <div class="info-box">🌍 Real use: Comment → Post, Product → Category</div>
+          </div>
+        </div>
+
+        <!-- ManyToMany -->
+        <div class="card cardinal-card">
+          <div class="card-header" onclick="toggleCard(this)">
+            <div class="cardinal-badge mtm">N → N</div>
+            <h3>@ManyToMany</h3>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="card-body">
+            <p><strong>Multiple objects on both sides can relate to each other.</strong></p>
+            <p>📌 Example: An <em>Étudiant</em> follows many <em>Cours</em>, and a <em>Cours</em> is followed by many students.</p>
+            <div class="code-block">
+<pre><span class="kw">@Entity</span>
+<span class="kw">public class</span> <span class="cls">Etudiant</span> {
+    <span class="kw">@ManyToMany</span>
+    <span class="kw">@JoinTable</span>(name=<span class="str">"etudiant_cours"</span>,
+      joinColumns=<span class="kw">@JoinColumn</span>(name=<span class="str">"etudiant_id"</span>),
+      inverseJoinColumns=<span class="kw">@JoinColumn</span>(name=<span class="str">"cours_id"</span>))
+    <span class="kw">private</span> Set&lt;Cours&gt; cours
+        = <span class="kw">new</span> HashSet&lt;&gt;();
+}
+
+<span class="kw">@Entity</span>
+<span class="kw">public class</span> <span class="cls">Cours</span> {
+    <span class="kw">@ManyToMany</span>(mappedBy=<span class="str">"cours"</span>)
+    <span class="kw">private</span> Set&lt;Etudiant&gt; etudiants;
+}</pre>
+            </div>
+            <p><strong>DB result:</strong> An <strong>intermediate join table</strong> <code>etudiant_cours</code> is created with two FK columns.</p>
+            <div class="info-box">🌍 Real use: Student ↔ Courses, User ↔ Roles, Product ↔ Tags</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Visual diagram -->
+      <div class="diagram-box">
+        <h4>📊 Quick Reference Table</h4>
+        <table class="ref-table">
+          <thead>
+            <tr><th>Cardinality</th><th>Annotation</th><th>Example</th><th>DB Result</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>1 – 1</td><td><code>@OneToOne</code></td><td>Person / Passport</td><td>FK in one table</td></tr>
+            <tr><td>1 – N</td><td><code>@OneToMany</code></td><td>Client / Commandes</td><td>FK in child table</td></tr>
+            <tr><td>N – 1</td><td><code>@ManyToOne</code></td><td>Commande / Client</td><td>FK in this table</td></tr>
+            <tr><td>N – N</td><td><code>@ManyToMany</code></td><td>Étudiant / Cours</td><td>Join table created</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════ 4. COLLECTIONS ══════════════════════════ -->
+    <section id="collections" class="content-section alt-bg">
+      <div class="section-label">Chapter 04</div>
+      <h2>Java Collections in JPA Associations</h2>
+      <p class="section-intro">When a relation contains multiple objects (1-N or N-N), you must store them in a <strong>Java collection</strong>. The choice of collection <em>impacts business logic and data behaviour</em>.</p>
+
+      <div class="cards-grid four-col">
+
+        <div class="card coll-card">
+          <div class="card-header" onclick="toggleCard(this)">
+            <span class="coll-icon" style="background:#6366f1">C</span>
+            <h3>Collection</h3>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="card-body">
+            <p><strong>What:</strong> The root Java interface for all collection types. It's the most generic.</p>
+            <p><strong>Characteristics:</strong> General interface — no ordering guarantee, duplicates depend on implementation.</p>
+            <p><strong>Use when:</strong> You want to stay flexible and don't yet know which specific type you'll need.</p>
+            <div class="code-block">
+<pre><span class="kw">private</span> Collection&lt;Commande&gt; commandes;</pre>
+            </div>
+            <div class="info-box">💡 Prefer a more specific type (List or Set) for clarity.</div>
+          </div>
+        </div>
+
+        <div class="card coll-card">
+          <div class="card-header" onclick="toggleCard(this)">
+            <span class="coll-icon" style="background:#10b981">L</span>
+            <h3>List</h3>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="card-body">
+            <p><strong>What:</strong> An ordered, indexed collection. Allows duplicate elements.</p>
+            <p><strong>Characteristics:</strong> Maintains insertion order. You can access elements by index.</p>
+            <p><strong>Use when:</strong> The order of elements matters (e.g., ordered list of commands by date).</p>
+            <div class="code-block">
+<pre><span class="kw">@OneToMany</span>(mappedBy=<span class="str">"client"</span>)
+<span class="kw">private</span> List&lt;Commande&gt; commandes
+    = <span class="kw">new</span> ArrayList&lt;&gt;();</pre>
+            </div>
+            <div class="info-box">🌍 Real use: Timeline of events, ordered steps, ranked results.</div>
+          </div>
+        </div>
+
+        <div class="card coll-card">
+          <div class="card-header" onclick="toggleCard(this)">
+            <span class="coll-icon" style="background:#f59e0b">S</span>
+            <h3>Set</h3>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="card-body">
+            <p><strong>What:</strong> A collection with <strong>no duplicate elements</strong>.</p>
+            <p><strong>Characteristics:</strong> No guaranteed order. Each object appears only once.</p>
+            <p><strong>Use when:</strong> You want to prevent duplicate entries — e.g., a user can't enrol in the same course twice.</p>
+            <div class="code-block">
+<pre><span class="kw">@ManyToMany</span>
+<span class="kw">private</span> Set&lt;Cours&gt; cours
+    = <span class="kw">new</span> HashSet&lt;&gt;();</pre>
+            </div>
+            <div class="info-box">🌍 Real use: User roles, product tags, student enrollments.</div>
+          </div>
+        </div>
+
+        <div class="card coll-card">
+          <div class="card-header" onclick="toggleCard(this)">
+            <span class="coll-icon" style="background:#ef4444">M</span>
+            <h3>Map</h3>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="card-body">
+            <p><strong>What:</strong> A key-value store. Each key is unique and maps to a value.</p>
+            <p><strong>Characteristics:</strong> Fast lookup by key. Less common in JPA associations but useful for element collections.</p>
+            <p><strong>Use when:</strong> You need to access data by a specific key (e.g., phone numbers by type: "home", "work").</p>
+            <div class="code-block">
+<pre><span class="kw">@ElementCollection</span>
+<span class="kw">private</span> Map&lt;String, String&gt; phones;</pre>
+            </div>
+            <div class="info-box">🌍 Real use: Config properties, locale translations, attribute maps.</div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="key-concept-box">
+        <h4>⚠️ Important Best Practice</h4>
+        <p><strong>Always initialise your collections from the start</strong> to avoid <code>NullPointerException</code>:</p>
+        <div class="code-block">
+<pre><span class="cm">// ✅ CORRECT — initialised</span>
+<span class="kw">private</span> List&lt;Commande&gt; commandes = <span class="kw">new</span> ArrayList&lt;&gt;();
+<span class="kw">private</span> Set&lt;Cours&gt; cours = <span class="kw">new</span> HashSet&lt;&gt;();
+
+<span class="cm">// ❌ WRONG — causes NullPointerException on first access</span>
+<span class="kw">private</span> List&lt;Commande&gt; commandes;</pre>
+        </div>
+        <p>In practice, <strong>List and Set</strong> are the most frequently used collections in JPA associations.</p>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════ 5. MAPPING ══════════════════════════ -->
+    <section id="mapping" class="content-section">
+      <div class="section-label">Chapter 05</div>
+      <h2>Reading the Mapping — Who Owns the Foreign Key?</h2>
+      <p class="section-intro">The notes describe the full mapping logic for the classic <em>Client–Commande</em> example. Let's decode it step by step.</p>
+
+      <div class="cards-grid">
+
+        <div class="card">
+          <div class="card-header" onclick="toggleCard(this)">
+            <span class="card-icon">🧠</span>
+            <h3>Business Rules for Client–Commande</h3>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="card-body">
+            <ol>
+              <li>A <em>client</em> can exist without any orders.</li>
+              <li>An <em>order</em> always belongs to exactly one client.</li>
+              <li>Multiple orders can belong to multiple clients.</li>
+            </ol>
+            <p>From these rules we derive:</p>
+            <ul>
+              <li><code>Client</code> side → <strong>@OneToMany</strong></li>
+              <li><code>Commande</code> side → <strong>@ManyToOne</strong> (owns the FK)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header" onclick="toggleCard(this)">
+            <span class="card-icon">🗄️</span>
+            <h3>What Happens in the Database?</h3>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="card-body">
+            <p>The <strong>Commande</strong> table contains a column <code>client_id</code> — the <em>foreign key</em> that links each order to its client.</p>
+            <div class="db-diagram">
+              <div class="db-table">
+                <div class="db-table-name">client</div>
+                <div class="db-col pk">🔑 id</div>
+                <div class="db-col">nom</div>
+                <div class="db-col">email</div>
+              </div>
+              <div class="db-arrow">← FK</div>
+              <div class="db-table">
+                <div class="db-table-name">commande</div>
+                <div class="db-col pk">🔑 id</div>
+                <div class="db-col">montant</div>
+                <div class="db-col fk">🔗 client_id</div>
+              </div>
+            </div>
+            <p>The <code>client_id</code> column in <code>commande</code> is the <strong>foreign key</strong>, confirming that <code>Commande</code> is the <strong>owner side</strong>.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header" onclick="toggleCard(this)">
+            <span class="card-icon">🔄</span>
+            <h3>ManyToMany — The Join Table</h3>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="card-body">
+            <p>For N–N (e.g., Étudiant ↔ Cours), there is <strong>no FK column in either entity table</strong>. Instead JPA creates an <strong>intermediate join table</strong>:</p>
+            <div class="db-diagram">
+              <div class="db-table">
+                <div class="db-table-name">etudiant</div>
+                <div class="db-col pk">🔑 id</div>
+                <div class="db-col">nom</div>
+              </div>
+              <div class="db-arrow">↔</div>
+              <div class="db-table">
+                <div class="db-table-name">etudiant_cours</div>
+                <div class="db-col fk">🔗 etudiant_id</div>
+                <div class="db-col fk">🔗 cours_id</div>
+              </div>
+              <div class="db-arrow">↔</div>
+              <div class="db-table">
+                <div class="db-table-name">cours</div>
+                <div class="db-col pk">🔑 id</div>
+                <div class="db-col">titre</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header" onclick="toggleCard(this)">
+            <span class="card-icon">📐</span>
+            <h3>Owner Side Rule</h3>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="card-body">
+            <p>The <strong>owner side</strong> is the one that actually contains the foreign key (or join table definition). Key facts:</p>
+            <ul>
+              <li>In a <strong>OneToMany / ManyToOne</strong> pair → <code>@ManyToOne</code> is always the owner.</li>
+              <li>In a <strong>OneToOne</strong> → the side with <code>@JoinColumn</code> is the owner.</li>
+              <li>In a <strong>ManyToMany</strong> → the side with <code>@JoinTable</code> is the owner.</li>
+              <li>The <strong>inverse side</strong> uses <code>mappedBy="fieldName"</code> pointing to the owner's field.</li>
+            </ul>
+            <div class="info-box">⚠️ If you forget <code>mappedBy</code>, Hibernate creates an extra unwanted join table!</div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="key-concept-box">
+        <h4>🎯 Complete Bidirectional Client–Commande Example</h4>
+        <div class="code-block">
+<pre><span class="cm">// ── Client.java ─────────────────────────────</span>
+<span class="kw">@Entity</span>
+<span class="kw">public class</span> <span class="cls">Client</span> {
+    <span class="kw">@Id</span> <span class="kw">@GeneratedValue</span>
+    <span class="kw">private</span> Long id;
+    <span class="kw">private</span> String nom;
+
+    <span class="kw">@OneToMany</span>(mappedBy = <span class="str">"client"</span>, cascade = CascadeType.ALL)
+    <span class="kw">private</span> List&lt;Commande&gt; commandes = <span class="kw">new</span> ArrayList&lt;&gt;();
+}
+
+<span class="cm">// ── Commande.java ───────────────────────────</span>
+<span class="kw">@Entity</span>
+<span class="kw">public class</span> <span class="cls">Commande</span> {
+    <span class="kw">@Id</span> <span class="kw">@GeneratedValue</span>
+    <span class="kw">private</span> Long id;
+    <span class="kw">private</span> Double montant;
+
+    <span class="kw">@ManyToOne</span>
+    <span class="kw">@JoinColumn</span>(name = <span class="str">"client_id"</span>)  <span class="cm">// ← Owner side</span>
+    <span class="kw">private</span> Client client;
+}</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════ QUIZ ══════════════════════════ -->
+    <section id="quiz" class="content-section alt-bg">
+      <div class="section-label">Test Yourself</div>
+      <h2>Knowledge Quiz 🎯</h2>
+      <p class="section-intro">Answer all questions, then check your score. Each question has an explanation to deepen your understanding.</p>
+
+      <div id="quiz-container">
+        <!-- Questions are injected by script.js -->
+      </div>
+
+      <div id="quiz-result" class="quiz-result hidden">
+        <div class="result-inner">
+          <div class="result-score" id="result-score"></div>
+          <div class="result-message" id="result-message"></div>
+          <button onclick="restartQuiz()" class="cta-btn">Retry Quiz</button>
+        </div>
+      </div>
+
+      <button id="submit-quiz" class="cta-btn quiz-submit">Submit Answers</button>
+    </section>
+
+  </main>
+
+  <!-- ══════════════════════════ FOOTER ══════════════════════════ -->
+  <footer>
+    <div class="footer-inner">
+      <p>Built from handwritten JPA/Hibernate course notes • Interactive Learning Guide</p>
+      <p class="footer-tech">Java · JPA · Hibernate · Spring Boot · SQL</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
